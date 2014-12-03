@@ -119,6 +119,11 @@ func TestTryLoad(t *testing.T) {
 		t.Fatalf("loadPath() got %+v, want %+v\n", c, want)
 	}
 
+	// A broken config should produce an error.
+	if err := tryLoad("badconfig.yaml", &c); err == nil {
+		t.Fatalf("tryLoad(badconfig.yaml) want err, got none")
+	}
+
 	// Loading the config when starting from a directory `MaxSteps` down
 	// should work.
 	BasePath = "testdata/1/2/3/4/5"

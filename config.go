@@ -7,6 +7,7 @@ package config
 import (
 	"fmt"
 	"io/ioutil"
+	"os"
 	"path/filepath"
 	"strings"
 
@@ -58,14 +59,17 @@ func tryLoad(name string, v interface{}) error {
 	tries := uint(0)
 	path := filepath.Join(BasePath, name)
 	for tries <= MaxSteps {
-		err := loadPath(path, v)
+		err = loadPath(path, v)
 		if err == nil {
 			return nil
+		} else if os.IsNotExist(err) {
+			path = filepath.Join(BasePath, strings.Repeat("../", int(tries+1)), name)
+			tries += 1
+		} else {
+			return err // not missing file; something else is wrong, so bail.
 		}
-		path = filepath.Join(BasePath, strings.Repeat("../", int(tries+1)), name)
-		tries += 1
 	}
-	return fmt.Errorf("failed to find a valid %q: %v", name, err)
+	return fmt.Errorf("failed to find a valid %s: %v", name, err)
 }
 
 // loadPath parses the YAML-encoded config at path and stores the
@@ -73,6 +77,9 @@ func tryLoad(name string, v interface{}) error {
 func loadPath(path string, v interface{}) error {
 	b, err := ioutil.ReadFile(path)
 	if err != nil {
+		if os.IsNotExist(err) {
+			return err
+		}
 		return fmt.Errorf("couldn't read config: %v", err)
 	}
 
