@@ -1,7 +1,6 @@
 // Package config provides a wrapper around YAML configs.
 //
-// The default name is config.yaml, with an optional overrides.yaml
-// file, for local overrides.
+// The default name is config.yaml.
 //
 // To use, define a struct representing the parts of the YAML config
 // you care about. If the importing package has a `config.yaml` with
@@ -34,21 +33,15 @@ import (
 )
 
 var (
-	defaultConfigName         = "config.yaml"    // default name of YAML config file
-	defaultOverridesName      = "overrides.yaml" // default name of optional YAML config with local overrides
-	BasePath                  = "."              // where to start looking for configs; relative to importing code
-	MaxSteps             uint = 5                // maximum number of directories to step up while looking for configs
+	defaultConfigName      = "config.yaml" // default name of YAML config file
+	BasePath               = "."           // where to start looking for configs; relative to importing code
+	MaxSteps          uint = 5             // maximum number of directories to step up while looking for configs
 
 )
 
 // Name applies the option to set a name for the YAML config file.
 func Name(name string) option {
 	return option{"configName", name}
-}
-
-// Overrides applies the option to set a name for the YAML overrides file.
-func Overrides(name string) option {
-	return option{"overridesName", name}
 }
 
 // MustLoad is like Load, but panics if the config can't be loaded or
@@ -64,12 +57,9 @@ func MustLoad(v interface{}, options ...option) {
 // stores the result in the value pointed to by v.
 func Load(v interface{}, options ...option) error {
 	configName := defaultConfigName
-	overridesName := defaultOverridesName
 	for _, opt := range options {
 		if opt.name == "configName" {
 			configName = opt.value
-		} else if opt.name == "overridesName" {
-			overridesName = opt.value
 		} else {
 			return fmt.Errorf("internal: bad option name %q", opt.name)
 		}
@@ -78,12 +68,6 @@ func Load(v interface{}, options ...option) error {
 	if err != nil {
 		return err
 	}
-	// Note: Since it's not required to have an overrides.yaml, we
-	// treat a failed load as a non-error. It would be nice to log an
-	// INFO message at this point to alert the caller that overrides
-	// file is missing (to make the feature more discoverable), but we
-	// can't use glog in case we're called from AppEngine.
-	_ = tryLoad(overridesName, v)
 	return nil
 }
 

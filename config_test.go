@@ -45,12 +45,11 @@ func TestMustLoad(t *testing.T) {
 	}()
 
 	want := testConfig{}
-	want.Twitter.Token = "zomgAnewFakeToken"
+	want.Twitter.Token = "YEAHaTOKEN"
 	want.Twitter.Secret = "NAHNOTREALLY"
 	want.Twitter.TestAccounts = []string{
 		"notarealaccount1",
 		"notarealaccount2",
-		"notarealaccount3",
 	}
 	c := testConfig{}
 	MustLoad(&c)
@@ -75,12 +74,11 @@ func TestLoad(t *testing.T) {
 	}
 
 	want := testConfig{}
-	want.Twitter.Token = "zomgAnewFakeToken"
+	want.Twitter.Token = "YEAHaTOKEN"
 	want.Twitter.Secret = "NAHNOTREALLY"
 	want.Twitter.TestAccounts = []string{
 		"notarealaccount1",
 		"notarealaccount2",
-		"notarealaccount3",
 	}
 	if !reflect.DeepEqual(c, want) {
 		t.Fatalf("Load() got %+v, want %+v\n", c, want)
@@ -101,14 +99,6 @@ func TestLoad_Custom(t *testing.T) {
 	}
 	if !reflect.DeepEqual(c, want) {
 		t.Fatalf("Load(Name(%s)) got %+v, want %+v\n", "custom.yaml", c, want)
-	}
-
-	want.Twitter.Custom = "very"
-	if err := Load(&c, Name("custom.yaml"), Overrides("customoverrides.yaml")); err != nil {
-		t.Fatalf("Load(Name(%s), Overrides(%s)) failed: %v\n", "custom.yaml", "overrides.yaml", err)
-	}
-	if !reflect.DeepEqual(c, want) {
-		t.Fatalf("Load(Name(%s), Overrides(%s)) got %+v, want %+v\n", "custom.yaml", "overrides.yaml", c, want)
 	}
 }
 
