@@ -94,7 +94,7 @@ func TestLoad_Custom(t *testing.T) {
 	}{}
 	want := c
 	want.Twitter.Custom = "yes"
-	if err := Load(&c, Name("custom.yaml")); err != nil {
+	if err := LoadName(&c, "custom.yaml"); err != nil {
 		t.Fatalf("Load(Name(%s)) failed: %v\n", "custom.yaml", err)
 	}
 	if !reflect.DeepEqual(c, want) {
@@ -109,7 +109,7 @@ func TestLoadPath(t *testing.T) {
 	want.Twitter.Secret = "NAHNOTREALLY"
 	want.Twitter.TestAccounts = []string{"notarealaccount1", "notarealaccount2"}
 
-	if err := loadPath("testdata/config.yaml", &c); err != nil {
+	if err := loadPath("testdata/config.yaml", &c, defaultFileReader); err != nil {
 		t.Fatalf("loadPath(testdata/config.yaml) got err: %v\n", err)
 	}
 	if !reflect.DeepEqual(c, want) {
@@ -127,7 +127,7 @@ func TestTryLoad(t *testing.T) {
 	want.Twitter.Secret = "NAHNOTREALLY"
 	want.Twitter.TestAccounts = []string{"notarealaccount1", "notarealaccount2"}
 	c := testConfig{}
-	if err := tryLoad("config.yaml", &c); err != nil {
+	if err := tryLoad(&c, "config.yaml", defaultFileReader); err != nil {
 		t.Fatalf("tryLoad(config.yaml) got err: %v\n", err)
 	}
 	if !reflect.DeepEqual(c, want) {
@@ -135,7 +135,7 @@ func TestTryLoad(t *testing.T) {
 	}
 
 	// A broken config should produce an error.
-	if err := tryLoad("badconfig.yaml", &c); err == nil {
+	if err := tryLoad(&c, "badconfig.yaml", defaultFileReader); err == nil {
 		t.Fatalf("tryLoad(badconfig.yaml) want err, got none")
 	}
 
@@ -144,7 +144,7 @@ func TestTryLoad(t *testing.T) {
 	BasePath = "testdata/1/2/3/4/5"
 	MaxSteps = 5
 	c = testConfig{}
-	if err := tryLoad("config.yaml", &c); err != nil {
+	if err := tryLoad(&c, "config.yaml", defaultFileReader); err != nil {
 		t.Fatalf("tryLoad(config.yaml) got err: %v\n", err)
 	}
 	if !reflect.DeepEqual(c, want) {
@@ -154,7 +154,7 @@ func TestTryLoad(t *testing.T) {
 	// Now we're too deeply nested, should give up and return err.
 	MaxSteps = 4
 	c = testConfig{}
-	if err := tryLoad("config.yaml", &c); err == nil {
+	if err := tryLoad(&c, "config.yaml", defaultFileReader); err == nil {
 		t.Fatalf("tryLoad(config.yaml) want err, got none")
 	}
 }
